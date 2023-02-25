@@ -15,7 +15,17 @@ import OffersController from "./controllers/offers-controller.js";
 const app = express();
 
 const CONNECTION_STRING = (process.env.DB_CONNECTION_STRING);
-mongoose.connect(CONNECTION_STRING);
+
+const connectWithRetry = function () {
+    return mongoose.connect(CONNECTION_STRING, function (err) {
+        if (err) {
+            console.error('Failed to connect to mongo on startup - retrying in 5 sec', err);
+            setTimeout(connectWithRetry, 5000);
+        }
+    });
+};
+connectWithRetry();
+
 
 app.use(cors({
     origin: (process.env.CORS_URL || 'http://localhost:3000'),
