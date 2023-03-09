@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv'
+dotenv.config();
+
 import mongoose from "mongoose";
 import express from "express";
 import session from "express-session";
@@ -14,6 +17,7 @@ import ListingsController from "./controllers/listings-controller.js";
 import OffersController from "./controllers/offers-controller.js";
 const app = express();
 
+
 const CONNECTION_STRING = (process.env.DB_CONNECTION_STRING);
 
 const connectWithRetry = function () {
@@ -28,7 +32,7 @@ connectWithRetry();
 
 
 app.use(cors({
-    origin: (process.env.CORS_URL || 'http://localhost:3000'),
+    origin: (process.env.CORS_URL),
     credentials: true
 }));
 
@@ -71,4 +75,4 @@ TransactionsController(app);
 ListingsController(app);
 OffersController(app);
 
-app.listen(process.env.PORT || 4000);
+app.listen(process.env.PORT);
