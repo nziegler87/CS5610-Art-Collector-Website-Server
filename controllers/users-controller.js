@@ -1,6 +1,8 @@
 import userDao from "../database/users/users-dao.js";
 import collectionDao from "../database/collection/collection-dao.js";
 import express from "express";
+import bcrypt from 'bcrypt';
+const saltRounds = 10;
 
 const usersController = (app) => {
     app.use(express.json());
@@ -38,7 +40,18 @@ const findUserByEmail = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
-   const user = req.body;
+    const user = req.body;
+    const password = user.password;
+    let hash = null;
+    // if admin is wanting to update a password, then determine the hash
+    if ( password ){
+        hash = await bcrypt.hash(password, saltRounds);
+    }
+
+    if ( hash ) {
+        user.password = hash;
+    }
+
     const user_id = user._id;
     const status = await userDao.updateUser(user_id, user)
     if (status.modifiedCount === 1) {

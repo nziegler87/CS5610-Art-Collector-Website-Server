@@ -1,5 +1,7 @@
 import userDao from "../database/users/users-dao.js";
 import collectionDao from "../database/collection/collection-dao.js";
+import bcrypt from 'bcrypt';
+const saltRounds = 10;
 
 const authController = (app) => {
     app.post("/api/auth/login", login);
@@ -13,6 +15,9 @@ const authController = (app) => {
 const signup = async (req, res) => {
     // retrieve contents of the body
     const user = req.body;
+    const password = user.password;
+    const hash = await bcrypt.hash(password, saltRounds);
+    user.password = hash;
 
     // check to see if they are an existing user based on email in mongo
     const existingUser = await userDao.findUserByEmail(user.email);
@@ -50,7 +55,7 @@ const signup = async (req, res) => {
             }
         }
 
-        insertedUser.password = '';
+        insertedUser.password = '*****';
         req.session['profile'] = insertedUser;
         res.json(insertedUser);
     }
@@ -58,9 +63,14 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
     const user = req.body;
-    const existingUser = await userDao.findUserByCredentials(user.email, user.password);
-    if (existingUser) {
-        existingUser.password = '';
+    const email = user.email;
+    const password = user.password;
+    const existingUser = await userDao.findUserByEmail(email);
+    if ( existingUser ) console.log(`Found the user! Their username is ${existingUser.email}.`);
+
+    const match = await bcrypt.compare(password, existingUser.password);
+    if ( match ) {
+        existingUser.password = '****';
         req.session['profile'] = existingUser;
         res.json(existingUser);
     } else {
