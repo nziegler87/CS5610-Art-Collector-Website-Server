@@ -24,6 +24,7 @@ const signup = async (req, res) => {
 
     // if they are an existing user, return 403
     if (existingUser) {
+        console.log("User already exists")
         res.sendStatus(403)
 
         // otherwise, insert user in mongo
@@ -37,6 +38,7 @@ const signup = async (req, res) => {
 
         // if they do, return an error
         if ( exisitingCollection ) {
+            console.log("User already has a collection")
             res.sendStatus(403);
 
         } else {
@@ -51,6 +53,7 @@ const signup = async (req, res) => {
             const status = await userDao.updateUser(insertedUser._id, insertedUser)
 
             if ( status.modifiedCount !== 1 ) {
+                console.log("Couldn't update the collection")
                 res.sendStatus(403)
             }
         }
