@@ -66,7 +66,6 @@ const login = async (req, res) => {
     const email = user.email;
     const password = user.password;
     const existingUser = await userDao.findUserByEmail(email);
-    if ( existingUser ) console.log(`Found the user! Their username is ${existingUser.email}.`);
 
     const match = await bcrypt.compare(password, existingUser.password);
     if ( match ) {
