@@ -15,6 +15,7 @@ import CollectionsController from "./controllers/collection-controller.js";
 import TransactionsController from "./controllers/transactions-controller.js";
 import ListingsController from "./controllers/listings-controller.js";
 import OffersController from "./controllers/offers-controller.js";
+import MemoryStore from "express-session/session/memory.js";
 const app = express();
 
 
@@ -49,6 +50,9 @@ app.set('trust proxy', 1);
 // ^^ this also explains why cookies don't work in Safari
 
 app.use(session({
+    store: new MemoryStore({
+        checkPeriod: 86400000
+    }),
 
     // I believe this is just to encrypt data
     secret: process.env.NODE_ENV === 'production' ? process.env.SECRET_KEY : "super secret key",
