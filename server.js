@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import express from "express";
 import session from "express-session";
 import cors from "cors";
+import connectMongo from "connect-mongo";
+
 
 import UsersController from "./controllers/users-controller.js";
 import CommentsController from "./controllers/comments-controller.js";
@@ -16,6 +18,7 @@ import TransactionsController from "./controllers/transactions-controller.js";
 import ListingsController from "./controllers/listings-controller.js";
 import OffersController from "./controllers/offers-controller.js";
 import MemoryStore from "express-session/session/memory.js";
+import MongoStore from "connect-mongo";
 const app = express();
 
 
@@ -50,8 +53,9 @@ app.set('trust proxy', 1);
 // ^^ this also explains why cookies don't work in Safari
 
 app.use(session({
-    store: new MemoryStore({
-        checkPeriod: 86400000
+    store: new MongoStore({
+        mongooseConnection: mongoose.connection,
+        ttl: 8640,
     }),
 
     // I believe this is just to encrypt data
