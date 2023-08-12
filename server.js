@@ -17,8 +17,7 @@ import CollectionsController from "./controllers/collection-controller.js";
 import TransactionsController from "./controllers/transactions-controller.js";
 import ListingsController from "./controllers/listings-controller.js";
 import OffersController from "./controllers/offers-controller.js";
-import MemoryStore from "express-session/session/memory.js";
-import MongoStore from "connect-mongo";
+import {MongoClient} from "mongodb";
 const app = express();
 
 
@@ -52,11 +51,21 @@ app.set('trust proxy', 1);
 // https://stackoverflow.com/questions/59384430/cookies-only-set-in-chrome-not-set-in-safari-mobile-chrome-or-mobile-safari
 // ^^ this also explains why cookies don't work in Safari
 
+const clientPromise = MongoClient.connect(CONNECTION_STRING,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    });
+
+const MongoStore = connectMongo.create({
+    clientPromise,
+    dbName: 'test',
+    collectionName: 'sessions',
+    ttl: 8640
+});
+
 app.use(session({
-    store: new MongoStore({
-        mongooseConnection: mongoose.connection,
-        ttl: 8640,
-    }),
+    store: MongoStore,
 
     // I believe this is just to encrypt data
     secret: process.env.NODE_ENV === 'production' ? process.env.SECRET_KEY : "super secret key",
